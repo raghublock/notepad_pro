@@ -475,8 +475,10 @@ async function exchangeCodeForToken(code){
 /* ── WORKDRIVE ── */
 async function fetchWDFolder(tok,reg){
   try{
-    const r=await fetch('https://workdrive.zoho.'+reg+'/api/v1/privatespace',{headers:{'Authorization':'Zoho-oauthtoken '+tok,'Accept':'application/vnd.api+json'}});
+    const workerUrl=(localStorage.getItem('rn3_worker')||'https://zoho-token.raghuveerbhati525.workers.dev').replace(/\/+$/,'');
+    const r=await fetch(workerUrl+'/folder',{headers:{'X-Zoho-Token':tok,'Accept':'application/vnd.api+json'}});
     if(r.ok){const d=await r.json();const fid=d?.data?.attributes?.resource_id||d?.data?.id||'';if(fid){zFolderId=fid;localStorage.setItem('rn3_fold',fid);appendLog('📁 Folder: '+fid);}}
+    else{const e=await r.json();appendLog('⚠️ Folder error: '+JSON.stringify(e));}
   }catch(e){appendLog('⚠️ Folder: '+e.message);}
 }
 
@@ -491,8 +493,9 @@ async function upload(silent=false){
   const fid=zFolderId||'';
   if(!fid){appendLog('❌ Folder ID नहीं मिला');syncing=false;setSdot(zToken?'on':'off');return;}
   try{
-    const url='https://workdrive.zoho.'+reg+'/api/v1/upload?parent_id='+fid+'&override-name-exist=true';
-    const r=await fetch(url,{method:'POST',headers:{'Authorization':'Zoho-oauthtoken '+zToken},body:fd});
+    const workerUrl2=(localStorage.getItem('rn3_worker')||'https://zoho-token.raghuveerbhati525.workers.dev').replace(/\/+$/,'');
+    const url=workerUrl2+'/upload';
+    const r=await fetch(url,{method:'POST',headers:{'X-Zoho-Token':zToken,'X-Folder-Id':fid,'Content-Type':'multipart/form-data'},body:fd});
     let data={};try{data=await r.json();}catch(e){}
     if(r.ok||r.status===200||(data.data&&!data.errors)){
       const nfid=data?.data?.[0]?.attributes?.resource_id||data?.data?.[0]?.id||zFileId;
@@ -511,13 +514,15 @@ async function doDownload(){
   const reg=getRegion();appendLog('⬇️ Restore...');setSdot('sync');
   try{
     if(!zFolderId)await fetchWDFolder(zToken,reg);
-    const lr=await fetch('https://workdrive.zoho.'+reg+'/api/v1/files/'+zFolderId+'/files',{headers:{'Authorization':'Zoho-oauthtoken '+zToken,'Accept':'application/vnd.api+json'}});
+    const workerUrl3=(localStorage.getItem('rn3_worker')||'https://zoho-token.raghuveerbhati525.workers.dev').replace(/\/+$/,'');
+    const lr=await fetch(workerUrl3+'/files',{headers:{'X-Zoho-Token':zToken,'X-Folder-Id':zFolderId,'Accept':'application/vnd.api+json'}});
     if(!lr.ok)throw new Error('List fail: '+lr.status);
     const ld=await lr.json();const files=ld?.data||[];
     const bf=files.find(f=>(f?.attributes?.name||'').includes('rangeennotes'));
     if(!bf){appendLog('⚠️ Backup file नहीं मिली');toast('⚠️ Backup नहीं मिला');setSdot(zToken?'on':'off');return;}
     const fid=bf.id||bf?.attributes?.resource_id;zFileId=fid;localStorage.setItem('rn3_fid',fid);
-    const dr=await fetch('https://workdrive.zoho.'+reg+'/api/v1/download/'+fid,{headers:{'Authorization':'Zoho-oauthtoken '+zToken}});
+    const workerUrl4=(localStorage.getItem('rn3_worker')||'https://zoho-token.raghuveerbhati525.workers.dev').replace(/\/+$/,'');
+    const dr=await fetch(workerUrl4+'/download',{headers:{'X-Zoho-Token':zToken,'X-File-Id':fid}});
     if(!dr.ok)throw new Error('Download fail: '+dr.status);
     const bk=JSON.parse(await dr.text());
     if(bk.notes&&Array.isArray(bk.notes)){
