@@ -307,12 +307,15 @@ function renderNotes(q=''){
     list.forEach(n=>{
       const d=document.createElement('div');
       d.className='nc '+n.color;
-      d.innerHTML=(n.pinned?'<span class="pin">📌</span>':'')
-        +'<div class="nt">'+esc(n.title||'बिना शीर्षक')+'</div>'
-        +'<div class="np">'+esc(n.body)+'</div>'
-        +'<div class="nm"><span class="nd">'+n.date+'</span><span class="ni">'+(n.synced?'☁️':'💾')+'</span></div>'
-        +'<button class="ndel" onclick="delNote(event,''+n.id+'')">✕</button>';
-      d.addEventListener('click',()=>openNote(n.id));
+      const _pin = n.pinned ? '<span class="pin">📌</span>' : '';
+      const _syn = n.synced ? '☁️' : '💾';
+      d.innerHTML = _pin
+        + '<div class="nt">' + esc(n.title||'बिना शीर्षक') + '</div>'
+        + '<div class="np">' + esc(n.body) + '</div>'
+        + '<div class="nm"><span class="nd">' + n.date + '</span><span class="ni">' + _syn + '</span></div>'
+        + '<button class="ndel">✕</button>';
+      d.querySelector('.ndel').addEventListener('click',function(ev){ev.stopPropagation();delNote(ev,n.id);});
+      d.addEventListener('click',function(){openNote(n.id);});
       grid.appendChild(d);
     });
   }
