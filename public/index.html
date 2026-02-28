@@ -220,6 +220,7 @@ select.mi option{background:#1a0a2e;}
       </div>
     </div>
     <div class="ig"><label class="lb">CLIENT ID</label><input type="text" class="mi" id="zci" placeholder="1000.XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX" autocomplete="off" spellcheck="false"></div>
+    <div class="ig"><label class="lb">CLOUDFLARE WORKER URL</label><input type="text" class="mi" id="zwurl" placeholder="https://zoho-token.yourname.workers.dev" autocomplete="off" spellcheck="false"></div>
     <div class="ig"><label class="lb">REGION</label>
       <select class="mi" id="zreg">
         <option value="in" selected>India (.in)</option>
@@ -384,6 +385,8 @@ function startZohoLogin(){
   if(!cid){toast('⚠️ Client ID डालें');return;}
   if(!cid.startsWith('1000.')){toast('⚠️ Client ID "1000." से शुरू होनी चाहिए');return;}
   localStorage.setItem('rn3_cid',cid);localStorage.setItem('rn3_reg',reg);
+  const wurl=document.getElementById('zwurl').value.trim();
+  if(wurl)localStorage.setItem('rn3_worker',wurl);
   const params=new URLSearchParams({
     client_id:cid,response_type:'code',scope:ZOHO_SCOPES,
     redirect_uri:getRedirectUri(),access_type:'offline',prompt:'consent'
@@ -429,7 +432,8 @@ async function exchangeCodeForToken(code){
   toast('🔄 Token exchange हो रहा है...');
   setSdot('sync');
   try{
-    const resp = await fetch('/api/zoho-token', {
+    const workerUrl = localStorage.getItem('rn3_worker') || 'https://YOUR-WORKER.YOUR-NAME.workers.dev';
+    const resp = await fetch(workerUrl, {
       method: 'POST',
       headers: {'Content-Type':'application/json'},
       body: JSON.stringify({code: code, redirect_uri: getRedirectUri()})
@@ -530,7 +534,7 @@ function updateAcctUI(){
 function appendLog(msg){const l=document.getElementById('slog');l.innerHTML+='<br>'+msg;l.scrollTop=l.scrollHeight;}
 function openSync(){updateAcctUI();document.getElementById('sp').classList.add('open');}
 function closeSync(){document.getElementById('sp').classList.remove('open');}
-function openZM(){setRuDisplay();document.getElementById('zci').value=getClientId();document.getElementById('zreg').value=getRegion();document.getElementById('zm').classList.add('open');}
+function openZM(){setRuDisplay();document.getElementById('zci').value=getClientId();document.getElementById('zreg').value=getRegion();const wu=document.getElementById('zwurl');if(wu)wu.value=localStorage.getItem('rn3_worker')||'';document.getElementById('zm').classList.add('open');}
 function closeZM(){document.getElementById('zm').classList.remove('open');}
 
 let _tt;
