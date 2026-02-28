@@ -432,7 +432,7 @@ async function exchangeCodeForToken(code){
   toast('🔄 Token exchange हो रहा है...');
   setSdot('sync');
   try{
-    const workerUrl = localStorage.getItem('rn3_worker') || 'https://YOUR-WORKER.YOUR-NAME.workers.dev';
+    const workerUrl = localStorage.getItem('rn3_worker') || 'https://notepad-pro.raghuveerbhati525.workers.dev';
     const resp = await fetch(workerUrl, {
       method: 'POST',
       headers: {'Content-Type':'application/json'},
