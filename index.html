@@ -572,6 +572,11 @@ if('serviceWorker' in navigator){
 
 /* Check for token returned from same-tab redirect */
 window.addEventListener('load',function(){
+  // Force correct worker URL - clear any wrong cached URL
+  const currentWorker = localStorage.getItem('rn3_worker');
+  if(currentWorker && currentWorker.includes('notepad.raghu')){
+    localStorage.removeItem('rn3_worker');
+  }
   const stored=localStorage.getItem('zoho_implicit_token');
   if(stored){localStorage.removeItem('zoho_implicit_token');try{const p=JSON.parse(stored);if(p&&p.access_token)handleImplicitToken(p);}catch(e){}}
   const storedCode=localStorage.getItem('zoho_auth_code');
