@@ -404,8 +404,9 @@ window.addEventListener('message',function(e){
   if(e.data.type==='ZOHO_IMPLICIT_TOKEN'){
     const p=e.data.payload;if(p&&p.access_token)handleImplicitToken(p);
   } else if(e.data.type==='ZOHO_AUTH_CODE'){
-    // Exchange code for token via Netlify function
-    exchangeCodeForToken(e.data.code);
+    // Exchange code for token via Cloudflare Worker
+    if(e.data.code) exchangeCodeForToken(e.data.code);
+    else toast('❌ Code missing in message',3000);
   } else if(e.data.type==='ZOHO_AUTH_ERROR'){
     toast('❌ Zoho error: '+(e.data.error||'unknown'),4000);setSdot('off');
   }
@@ -431,14 +432,19 @@ async function handleImplicitToken(payload){
 
 /* ── TOKEN EXCHANGE via Netlify Function ── */
 async function exchangeCodeForToken(code){
-  toast('🔄 Token exchange हो रहा है...');
+  if(!code){toast('❌ Code empty!',3000);return;}
+  toast('🔄 Token exchange: '+code.slice(0,15)+'...');
   setSdot('sync');
   try{
     const workerUrl = localStorage.getItem('rn3_worker') || 'https://notepad-pro.raghuveerbhati525.workers.dev';
+    const redirectUri = getRedirectUri();
+    appendLog('🔄 Worker: '+workerUrl);
+    appendLog('🔄 redirect_uri: '+redirectUri);
+    appendLog('🔄 code: '+code.slice(0,20)+'...');
     const resp = await fetch(workerUrl, {
       method: 'POST',
       headers: {'Content-Type':'application/json'},
-      body: JSON.stringify({code: code, redirect_uri: getRedirectUri()})
+      body: JSON.stringify({code: code, redirect_uri: redirectUri})
     });
     const data = await resp.json();
     if(data.error){
@@ -561,7 +567,14 @@ window.addEventListener('load',function(){
   const stored=localStorage.getItem('zoho_implicit_token');
   if(stored){localStorage.removeItem('zoho_implicit_token');try{const p=JSON.parse(stored);if(p&&p.access_token)handleImplicitToken(p);}catch(e){}}
   const storedCode=localStorage.getItem('zoho_auth_code');
-  if(storedCode){localStorage.removeItem('zoho_auth_code');try{const c=JSON.parse(storedCode);if(c&&c.code)exchangeCodeForToken(c.code);}catch(e){}}
+  if(storedCode){
+    localStorage.removeItem('zoho_auth_code');
+    try{
+      const c=JSON.parse(storedCode);
+      const codeVal = typeof c === 'string' ? c : (c.code || c);
+      if(codeVal) exchangeCodeForToken(codeVal);
+    }catch(e){ if(storedCode) exchangeCodeForToken(storedCode); }
+  }
   const storedErr=localStorage.getItem('zoho_auth_error');
   if(storedErr){localStorage.removeItem('zoho_auth_error');toast('❌ Zoho: '+storedErr,5000);}
   });
