@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html lang="hi">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Zoho Login...</title>
+<style>
+*{margin:0;padding:0;box-sizing:border-box;}
+body{font-family:sans-serif;background:#1a0a2e;color:#f0eaff;min-height:100vh;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:16px;text-align:center;padding:24px;}
+.spinner{width:48px;height:48px;border:4px solid rgba(168,85,247,0.2);border-top-color:#a855f7;border-radius:50%;animation:spin 0.8s linear infinite;}
+@keyframes spin{to{transform:rotate(360deg);}}
+.icon{font-size:52px;}
+h2{font-size:18px;font-weight:700;}
+p{color:#a090c0;font-size:13px;line-height:1.6;max-width:300px;}
+</style>
+</head>
+<body>
+<div id="wrap">
+  <div class="spinner"></div>
+  <h2>Login हो रहा है...</h2>
+  <p>कृपया प्रतीक्षा करें</p>
+</div>
+
+<script>
+(function(){
+  var wrap = document.getElementById('wrap');
+
+  function parseStr(str){
+    var o={};
+    if(!str)return o;
+    str.split('&').forEach(function(p){
+      var i=p.indexOf('=');
+      if(i>0){
+        try{o[decodeURIComponent(p.slice(0,i))]=decodeURIComponent(p.slice(i+1));}
+        catch(e){o[p.slice(0,i)]=p.slice(i+1);}
+      }
+    });
+    return o;
+  }
+
+  var rawHash  = window.location.hash.replace(/^#/,'');
+  var rawQuery = window.location.search.replace(/^\?/,'');
+  var hp = parseStr(rawHash);
+  var qp = parseStr(rawQuery);
+  var all = Object.assign({}, qp, hp);
+
+  var token = all['access_token'];
+  var code  = all['code'];
+  var error = all['error'] || all['error_description'];
+
+  function sendToParent(msg){
+    if(window.opener && !window.opener.closed){
+      try{
+        window.opener.postMessage(msg, '*');
+        wrap.innerHTML = '<div class="icon">✅</div><h2>Login हो गया!</h2><p>Window बंद हो रही है...</p>';
+        setTimeout(function(){ window.close(); }, 1200);
+        return;
+      }catch(e){}
+    }
+    // Same tab fallback
+    var key = msg.type === 'ZOHO_IMPLICIT_TOKEN' ? 'zoho_implicit_token' :
+              msg.type === 'ZOHO_AUTH_CODE'      ? 'zoho_auth_code'      : 'zoho_auth_error';
+    localStorage.setItem(key, JSON.stringify(msg.type === 'ZOHO_AUTH_ERROR' ? msg.error : (msg.payload || {code:msg.code,state:msg.state})));
+    wrap.innerHTML = '<div class="icon">✅</div><h2>Login हो गया!</h2><p>App पर जा रहे हैं...</p>';
+    setTimeout(function(){
+      window.location.replace(window.location.href.split('oauth_callback.html')[0] + 'index.html');
+    }, 800);
+  }
+
+  if(error){
+    wrap.innerHTML = '<div class="icon">❌</div><h2>Error</h2><p>' + error + '</p>';
+    sendToParent({type:'ZOHO_AUTH_ERROR', error:error});
+    return;
+  }
+
+  // Implicit flow - token in hash
+  if(token){
+    wrap.innerHTML = '<div class="icon">✅</div><h2>Token मिला!</h2><p>App को भेज रहे हैं...</p>';
+    sendToParent({type:'ZOHO_IMPLICIT_TOKEN', payload:{
+      access_token: token,
+      api_domain:   all['api_domain'] || '',
+      expires_in:   all['expires_in'] || '3600',
+      token_type:   all['token_type'] || 'Bearer',
+      scope:        all['scope']      || ''
+    }});
+    return;
+  }
+
+  // Auth code flow - code in query (Server-based app)
+  if(code){
+    wrap.innerHTML = '<div class="icon">🔄</div><h2>Code मिला!</h2><p>Token exchange हो रहा है...</p>';
+    sendToParent({type:'ZOHO_AUTH_CODE', code:code, state:all['state']||''});
+    return;
+  }
+
+  wrap.innerHTML = '<div class="icon">⚠️</div><h2>कुछ नहीं मिला</h2><p>Zoho ने कोई response नहीं भेजा।</p>';
+})();
+</script>
+</body>
+</html>
