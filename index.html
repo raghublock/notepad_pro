@@ -1,0 +1,572 @@
+<!DOCTYPE html>
+<html lang="hi">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<meta name="theme-color" content="#1a0a2e">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="रंगीन नोट्स">
+<link rel="manifest" href="manifest.json">
+<link rel="apple-touch-icon" href="icon-192.png">
+<title>🎨 रंगीन नोट्स</title>
+<link href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@400;500;600;700;800&family=Noto+Sans+Devanagari:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#1a0a2e;--glass:rgba(255,255,255,0.07);--gb:rgba(255,255,255,0.13);--text:#f0eaff;--sub:#a090c0;--r:18px;--rs:12px;--tr:0.25s cubic-bezier(0.34,1.2,0.64,1);}
+*{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent;}
+html,body{height:100%;overflow:hidden;}
+::-webkit-scrollbar{display:none;}
+body{font-family:'Baloo 2','Noto Sans Devanagari',sans-serif;background:var(--bg);color:var(--text);display:flex;flex-direction:column;max-width:480px;margin:0 auto;background-image:radial-gradient(ellipse at 15% 0%,rgba(168,85,247,0.22) 0%,transparent 55%),radial-gradient(ellipse at 85% 100%,rgba(255,107,107,0.18) 0%,transparent 55%);}
+
+/* HEADER */
+header{background:rgba(20,8,40,0.96);backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);border-bottom:1px solid var(--gb);padding:14px 16px 11px;flex-shrink:0;z-index:50;}
+.htop{display:flex;align-items:center;justify-content:space-between;margin-bottom:10px;}
+.logo{display:flex;align-items:center;gap:7px;}
+.logo h1{font-size:19px;font-weight:800;background:linear-gradient(135deg,#f472b6,#a855f7,#60a5fa);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;}
+#acctBtn{display:flex;align-items:center;gap:7px;background:var(--glass);border:1px solid var(--gb);border-radius:24px;padding:5px 11px 5px 5px;cursor:pointer;transition:background 0.2s;font-size:12px;color:var(--sub);font-family:inherit;}
+#acctBtn:hover{background:rgba(255,255,255,0.12);}
+.av{width:26px;height:26px;border-radius:50%;background:linear-gradient(135deg,#a855f7,#f472b6);display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:800;color:#fff;flex-shrink:0;}
+.acc-nm{max-width:80px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+.sdot{width:7px;height:7px;border-radius:50%;background:#4ade80;flex-shrink:0;}
+.sdot.off{background:#f87171;}.sdot.sync{background:#fbbf24;animation:blink 1s infinite;}
+@keyframes blink{0%,100%{opacity:1;}50%{opacity:0.3;}}
+.sbar{display:flex;gap:10px;align-items:center;}
+.srch{flex:1;display:flex;align-items:center;gap:8px;background:var(--glass);border:1px solid var(--gb);border-radius:24px;padding:7px 14px;transition:border-color 0.2s;}
+.srch:focus-within{border-color:rgba(168,85,247,0.5);}
+.srch svg{opacity:0.4;flex-shrink:0;}
+#si{background:none;border:none;outline:none;color:var(--text);font-size:14px;font-family:inherit;width:100%;}
+#si::placeholder{color:var(--sub);}
+.chip{background:var(--glass);border:1px solid var(--gb);border-radius:20px;padding:4px 11px;font-size:11px;color:var(--sub);font-weight:600;white-space:nowrap;}
+
+/* OFFLINE */
+#offbar{background:linear-gradient(90deg,#ef4444,#f97316);color:#fff;text-align:center;padding:7px;font-size:12px;font-weight:700;display:none;flex-shrink:0;}
+#offbar.on{display:block;}
+
+/* GRID */
+#grid{flex:1;overflow-y:auto;padding:14px;display:grid;grid-template-columns:1fr 1fr;gap:11px;align-content:start;}
+#empty{grid-column:1/-1;text-align:center;padding:50px 20px 30px;display:none;}
+#empty .em{font-size:62px;margin-bottom:10px;}
+#empty h3{font-size:17px;font-weight:700;margin-bottom:6px;}
+#empty p{color:var(--sub);font-size:13px;line-height:1.6;}
+
+/* NOTE CARDS */
+.nc{border-radius:var(--r);padding:13px;cursor:pointer;position:relative;min-height:125px;display:flex;flex-direction:column;gap:5px;box-shadow:0 6px 22px rgba(0,0,0,0.38);transition:transform var(--tr),box-shadow 0.2s;animation:pop 0.28s cubic-bezier(0.34,1.56,0.64,1);overflow:hidden;}
+.nc::before{content:'';position:absolute;inset:0;background:linear-gradient(135deg,rgba(255,255,255,0.18) 0%,transparent 55%);pointer-events:none;border-radius:inherit;}
+.nc:active{transform:scale(0.96);}
+.nc:hover{transform:translateY(-2px);box-shadow:0 12px 28px rgba(0,0,0,0.45);}
+@keyframes pop{from{transform:scale(0.78);opacity:0;}to{transform:scale(1);opacity:1;}}
+.nt{font-weight:700;font-size:13.5px;color:rgba(0,0,0,0.83);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.np{font-size:12px;color:rgba(0,0,0,0.62);flex:1;overflow:hidden;display:-webkit-box;-webkit-line-clamp:4;-webkit-box-orient:vertical;line-height:1.5;}
+.nm{display:flex;justify-content:space-between;align-items:center;margin-top:2px;}
+.nd{font-size:10px;color:rgba(0,0,0,0.42);font-weight:600;}
+.ni{font-size:11px;opacity:0.5;}
+.pin{position:absolute;top:8px;right:30px;font-size:12px;}
+.ndel{position:absolute;top:7px;right:7px;background:rgba(0,0,0,0.13);border:none;border-radius:50%;width:23px;height:23px;font-size:12px;cursor:pointer;color:rgba(0,0,0,0.5);display:none;align-items:center;justify-content:center;}
+.nc:hover .ndel{display:flex;}
+.ndel:hover{background:rgba(0,0,0,0.26);}
+.c0{background:linear-gradient(145deg,#ffe566,#ffd600);}.c1{background:linear-gradient(145deg,#ff9090,#ff5050);}.c2{background:linear-gradient(145deg,#76e8c0,#34c98c);}.c3{background:linear-gradient(145deg,#76d9d9,#2ec8c8);}.c4{background:linear-gradient(145deg,#c8b8fe,#a580fa);}.c5{background:linear-gradient(145deg,#ffb8d8,#fc78b8);}.c6{background:linear-gradient(145deg,#ffe2a8,#ffca5c);}.c7{background:linear-gradient(145deg,#96c8ff,#60a8ff);}.c8{background:linear-gradient(145deg,#88f0aa,#48de7a);}.c9{background:linear-gradient(145deg,#fcad88,#f97028);}
+
+/* FAB */
+#fab{position:fixed;bottom:22px;right:calc(50% - 240px + 16px);width:58px;height:58px;border-radius:50%;background:linear-gradient(135deg,#a855f7,#f472b6);border:none;color:#fff;font-size:27px;cursor:pointer;box-shadow:0 8px 26px rgba(168,85,247,0.52);display:flex;align-items:center;justify-content:center;z-index:100;transition:transform var(--tr);}
+#fab:active{transform:scale(0.9);}
+
+/* EDITOR */
+#ep{position:fixed;top:0;bottom:0;left:50%;margin-left:-240px;width:480px;z-index:200;display:flex;flex-direction:column;transform:translateY(100%);transition:transform 0.38s cubic-bezier(0.34,1.1,0.64,1);pointer-events:none;}
+#ep.open{transform:translateY(0);pointer-events:all;}
+@media(max-width:480px){#ep{left:0;margin-left:0;width:100%;}}
+#ep.open{transform:translateY(0);}
+.etop{padding:13px 14px 9px;display:flex;align-items:center;gap:9px;flex-shrink:0;}
+.ebk{background:rgba(0,0,0,0.13);border:none;border-radius:50%;width:37px;height:37px;font-size:17px;cursor:pointer;color:rgba(0,0,0,0.72);display:flex;align-items:center;justify-content:center;flex-shrink:0;}
+#ntitle{flex:1;background:transparent;border:none;font-size:17px;font-weight:700;color:rgba(0,0,0,0.84);font-family:inherit;outline:none;}
+#ntitle::placeholder{color:rgba(0,0,0,0.33);}
+.esave{background:rgba(0,0,0,0.14);border:none;border-radius:20px;padding:7px 15px;font-size:13px;font-weight:700;color:rgba(0,0,0,0.72);cursor:pointer;font-family:inherit;flex-shrink:0;}
+.etb{padding:5px 13px;display:flex;gap:5px;align-items:center;flex-shrink:0;}
+.fb{background:rgba(0,0,0,0.1);border:none;border-radius:7px;width:30px;height:29px;font-size:13px;cursor:pointer;color:rgba(0,0,0,0.62);display:flex;align-items:center;justify-content:center;font-family:inherit;font-weight:700;}
+.fsep{width:1px;height:18px;background:rgba(0,0,0,0.15);margin:0 1px;}
+.emeta{padding:2px 15px 6px;display:flex;justify-content:space-between;font-size:11px;color:rgba(0,0,0,0.42);flex-shrink:0;}
+#nbody{flex:1;background:transparent;border:none;padding:2px 15px 14px;font-size:14.5px;color:rgba(0,0,0,0.78);font-family:inherit;outline:none;resize:none;line-height:1.75;}
+#nbody::placeholder{color:rgba(0,0,0,0.35);}
+.crow{padding:9px 15px 18px;display:flex;gap:9px;overflow-x:auto;flex-shrink:0;}
+.cdot{width:29px;height:29px;border-radius:50%;border:3px solid transparent;cursor:pointer;flex-shrink:0;transition:transform 0.15s,border-color 0.15s;box-shadow:0 2px 7px rgba(0,0,0,0.22);}
+.cdot.on{border-color:rgba(0,0,0,0.52);transform:scale(1.28);}
+
+/* MODAL */
+.mo{position:fixed;inset:0;background:rgba(8,4,18,0.88);backdrop-filter:blur(14px);z-index:400;display:flex;align-items:flex-end;justify-content:center;opacity:0;pointer-events:none;transition:opacity 0.28s;}
+.mo.open{opacity:1;pointer-events:all;}
+.ms{background:linear-gradient(180deg,#241542 0%,#1a0a2e 100%);border:1px solid var(--gb);border-radius:26px 26px 0 0;padding:26px 22px 38px;width:100%;max-width:480px;transform:translateY(50px);transition:transform 0.36s cubic-bezier(0.34,1.1,0.64,1);}
+.mo.open .ms{transform:translateY(0);}
+.mh{width:38px;height:4px;background:rgba(255,255,255,0.18);border-radius:2px;margin:0 auto 18px;}
+.mt{font-size:19px;font-weight:800;margin-bottom:5px;background:linear-gradient(135deg,#a855f7,#f472b6);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;}
+.msub{font-size:13px;color:var(--sub);margin-bottom:20px;line-height:1.6;}
+.steps{display:flex;flex-direction:column;gap:10px;margin-bottom:18px;}
+.step{background:var(--glass);border:1px solid var(--gb);border-radius:var(--rs);padding:13px;}
+.sn{font-size:10px;font-weight:800;color:#fbbf24;margin-bottom:3px;letter-spacing:1px;}
+.st{font-size:12.5px;color:var(--text);line-height:1.55;}
+.st a{color:#a855f7;text-decoration:none;}
+.hl{background:rgba(168,85,247,0.15);padding:2px 7px;border-radius:5px;font-size:11px;color:#a855f7;word-break:break-all;display:inline-block;margin-top:3px;}
+.ig{display:flex;flex-direction:column;gap:7px;margin-bottom:14px;}
+.lb{font-size:11px;font-weight:700;color:var(--sub);letter-spacing:0.5px;}
+.mi{background:var(--glass);border:1px solid var(--gb);border-radius:var(--rs);padding:10px 13px;color:var(--text);font-size:14px;font-family:inherit;outline:none;transition:border-color 0.2s;width:100%;}
+.mi:focus{border-color:rgba(168,85,247,0.6);}
+.mi::placeholder{color:var(--sub);}
+select.mi option{background:#1a0a2e;}
+.bp{width:100%;padding:13px;border:none;border-radius:var(--rs);background:linear-gradient(135deg,#a855f7,#f472b6);color:#fff;font-size:14px;font-weight:700;font-family:inherit;cursor:pointer;box-shadow:0 4px 18px rgba(168,85,247,0.38);transition:transform 0.15s;}
+.bp:active{transform:scale(0.98);}
+.bs{width:100%;padding:11px;border:1px solid var(--gb);border-radius:var(--rs);background:var(--glass);color:var(--sub);font-size:13px;font-weight:600;font-family:inherit;cursor:pointer;margin-top:7px;}
+
+/* SYNC PANEL */
+#sp{position:fixed;top:0;bottom:0;left:50%;margin-left:-240px;width:480px;z-index:300;background:linear-gradient(180deg,#241542 0%,#1a0a2e 100%);transform:translateX(105%);transition:transform 0.34s cubic-bezier(0.34,1.1,0.64,1);display:flex;flex-direction:column;padding:20px;overflow-y:auto;pointer-events:none;}
+#sp.open{transform:translateX(0);pointer-events:all;}
+@media(max-width:480px){#sp{left:0;margin-left:0;width:100%;}}
+.sphead{display:flex;align-items:center;gap:10px;margin-bottom:22px;}
+.sptitle{font-size:17px;font-weight:800;}
+.sc{background:var(--glass);border:1px solid var(--gb);border-radius:var(--rs);padding:14px;margin-bottom:12px;}
+.sur{display:flex;align-items:center;gap:11px;margin-bottom:12px;}
+.sav{width:44px;height:44px;border-radius:50%;background:linear-gradient(135deg,#a855f7,#f472b6);display:flex;align-items:center;justify-content:center;font-size:16px;font-weight:800;color:#fff;}
+.sn2{font-size:14px;font-weight:700;}.se{font-size:11px;color:var(--sub);}
+.sst{display:flex;gap:8px;}
+.ssb{flex:1;background:rgba(0,0,0,0.2);border-radius:9px;padding:9px;text-align:center;}
+.ssv{font-size:19px;font-weight:800;color:#a855f7;}.ssl{font-size:10px;color:var(--sub);}
+.sar{display:flex;gap:8px;margin-bottom:10px;}
+.sb2{flex:1;padding:11px;border:none;border-radius:var(--rs);font-size:13px;font-weight:700;font-family:inherit;cursor:pointer;}
+.sup{background:linear-gradient(135deg,#a855f7,#7c3aed);color:#fff;}
+.sdn{background:linear-gradient(135deg,#3b82f6,#1d4ed8);color:#fff;}
+.slog{background:var(--glass);border:1px solid var(--gb);border-radius:var(--rs);padding:10px;font-size:11.5px;color:var(--sub);min-height:58px;max-height:90px;overflow-y:auto;line-height:1.7;}
+.lo{width:100%;padding:11px;border:1px solid rgba(248,113,113,0.3);border-radius:var(--rs);background:rgba(248,113,113,0.08);color:#f87171;font-size:13px;font-weight:600;font-family:inherit;cursor:pointer;margin-top:auto;}
+.tw{background:rgba(251,191,36,0.1);border:1px solid rgba(251,191,36,0.3);border-radius:var(--rs);padding:11px 13px;font-size:12px;color:#fbbf24;line-height:1.6;margin-bottom:12px;}
+.tw strong{display:block;margin-bottom:3px;}
+
+/* TOAST */
+#toast{position:fixed;bottom:96px;left:50%;transform:translateX(-50%) translateY(16px);background:rgba(24,12,50,0.97);border:1px solid var(--gb);backdrop-filter:blur(20px);border-radius:20px;padding:9px 18px;font-size:13px;font-weight:600;color:var(--text);z-index:999;opacity:0;pointer-events:none;transition:all 0.3s cubic-bezier(0.34,1.2,0.64,1);white-space:nowrap;}
+#toast.show{opacity:1;transform:translateX(-50%) translateY(0);}
+</style>
+</head>
+<body>
+<div id="offbar">📵 ऑफलाइन — नोट्स locally save हो रहे हैं</div>
+
+<header>
+  <div class="htop">
+    <div class="logo"><span>🎨</span><h1>रंगीन नोट्स</h1></div>
+    <button id="acctBtn" onclick="openSync()">
+      <div class="av" id="av">?</div>
+      <span class="acc-nm" id="acnm">Zoho जोड़ें</span>
+      <div class="sdot off" id="sdot"></div>
+    </button>
+  </div>
+  <div class="sbar">
+    <div class="srch">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
+      <input type="search" id="si" placeholder="नोट खोजें..." oninput="renderNotes(this.value)">
+    </div>
+    <div class="chip" id="ncc">0 नोट</div>
+  </div>
+</header>
+
+<div id="grid">
+  <div id="empty">
+    <div class="em">✍️</div>
+    <h3>अभी कोई नोट नहीं!</h3>
+    <p>नीचे <strong>+</strong> दबाकर<br>पहला नोट बनाएं</p>
+  </div>
+</div>
+
+<button id="fab" onclick="newNote()">＋</button>
+
+<div id="ep">
+  <div class="etop">
+    <button class="ebk" onclick="closeEditor()">←</button>
+    <input type="text" id="ntitle" placeholder="शीर्षक..." autocomplete="off">
+    <button class="esave" onclick="saveNote()">💾 सेव</button>
+  </div>
+  <div class="etb">
+    <button class="fb" onclick="fmt('**','**')"><b>B</b></button>
+    <button class="fb" onclick="fmt('_','_')"><i>I</i></button>
+    <button class="fb" onclick="fmt('\n• ','')">•</button>
+    <button class="fb" onclick="fmt('\n☐ ','')">☐</button>
+    <div class="fsep"></div>
+    <button class="fb" id="pinBtn" onclick="togglePin()" style="opacity:0.45">📌</button>
+  </div>
+  <div class="emeta"><span id="wc">0 शब्द</span><span id="cc">0 अक्षर</span></div>
+  <textarea id="nbody" placeholder="यहाँ लिखें..." oninput="updateMeta()"></textarea>
+  <div class="crow" id="crow"></div>
+</div>
+
+<!-- ZOHO MODAL -->
+<div class="mo" id="zm">
+  <div class="ms">
+    <div class="mh"></div>
+    <div class="mt">☁️ Zoho से जोड़ें</div>
+    <div class="msub">WorkDrive पर backup — किसी भी device से access</div>
+    <div class="steps">
+      <div class="step">
+        <div class="sn">STEP 1 — API CONSOLE</div>
+        <div class="st">
+          <a href="https://api-console.zoho.in/" target="_blank" rel="noopener">🔗 api-console.zoho.in</a> → <strong>Add Client</strong> → <strong>Server-based Applications</strong> चुनें<br><br>
+          <strong>Authorized Redirect URI:</strong><br>
+          <span class="hl" id="ruDisplay"></span>
+        </div>
+      </div>
+      <div class="step">
+        <div class="sn">STEP 2 — NETLIFY ENV VARIABLES</div>
+        <div class="st">
+          Netlify Dashboard → Site Settings → Environment Variables:<br>
+          <span class="hl">ZOHO_CLIENT_ID</span>
+          <span class="hl">ZOHO_CLIENT_SECRET</span>
+          <span class="hl">ZOHO_REGION = in</span>
+        </div>
+      </div>
+    </div>
+    <div class="ig"><label class="lb">CLIENT ID</label><input type="text" class="mi" id="zci" placeholder="1000.XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX" autocomplete="off" spellcheck="false"></div>
+    <div class="ig"><label class="lb">CLOUDFLARE WORKER URL</label><input type="text" class="mi" id="zwurl" placeholder="https://zoho-token.yourname.workers.dev" autocomplete="off" spellcheck="false"></div>
+    <div class="ig"><label class="lb">REGION</label>
+      <select class="mi" id="zreg">
+        <option value="in" selected>India (.in)</option>
+        <option value="com">Global (.com)</option>
+        <option value="eu">Europe (.eu)</option>
+        <option value="com.au">Australia (.com.au)</option>
+        <option value="jp">Japan (.jp)</option>
+      </select>
+    </div>
+    <button class="bp" onclick="startZohoLogin()">🚀 Zoho से Login करें</button>
+    <button class="bs" onclick="closeZM()">बाद में करूँगा</button>
+  </div>
+</div>
+
+<!-- SYNC PANEL -->
+<div id="sp">
+  <div class="sphead">
+    <button class="ebk" style="background:var(--glass);color:var(--text);" onclick="closeSync()">←</button>
+    <div class="sptitle">☁️ Zoho Backup</div>
+  </div>
+  <div id="spIn" style="display:none;flex-direction:column;gap:11px;flex:1">
+    <div class="tw"><strong>⚠️ Token 1 घंटे में expire होगा</strong>Implicit Flow की वजह से — 1 घंटे बाद दोबारा login करें।</div>
+    <div class="sc">
+      <div class="sur"><div class="sav" id="spAv">?</div><div><div class="sn2" id="spNm">—</div><div class="se" id="spEm">—</div></div></div>
+      <div class="sst"><div class="ssb"><div class="ssv" id="sNC">0</div><div class="ssl">नोट्स</div></div><div class="ssb"><div class="ssv" id="sLS" style="font-size:13px">—</div><div class="ssl">Last Sync</div></div></div>
+    </div>
+    <div class="sar">
+      <button class="sb2 sup" onclick="upload()">⬆️ Backup</button>
+      <button class="sb2 sdn" onclick="doDownload()">⬇️ Restore</button>
+    </div>
+    <div class="slog" id="slog">Zoho से जुड़ा है।</div>
+    <button class="bp" onclick="upload()" style="margin-top:4px">🔄 अभी Sync करें</button>
+    <button class="lo" onclick="zohoLogout()">🚪 Zoho Logout</button>
+  </div>
+  <div id="spOut" style="flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:14px;text-align:center;padding:20px;">
+    <div style="font-size:54px">☁️</div>
+    <h3 style="font-size:17px">Zoho Cloud Backup</h3>
+    <p style="color:var(--sub);font-size:13px;line-height:1.6">Zoho WorkDrive पर नोट्स save करें</p>
+    <button class="bp" onclick="closeSync();openZM()">🔗 Zoho से जोड़ें</button>
+  </div>
+</div>
+
+<div id="toast"></div>
+
+<script>
+'use strict';
+const COLORS=['c0','c1','c2','c3','c4','c5','c6','c7','c8','c9'];
+const CHEX={c0:'#ffe566',c1:'#ff9090',c2:'#76e8c0',c3:'#76d9d9',c4:'#c8b8fe',c5:'#ffb8d8',c6:'#ffe2a8',c7:'#96c8ff',c8:'#88f0aa',c9:'#fcad88'};
+const BACKUP_FILE='rangeennotes_v3.json';
+const ZOHO_SCOPES='WorkDrive.files.CREATE,WorkDrive.files.READ,WorkDrive.files.UPDATE,ZohoFiles.files.READ,AaaServer.profile.READ';
+
+let notes=[],curId=null,curColor='c0',curPinned=false,syncing=false;
+let zToken=null,zUser={},zFileId=null,zFolderId=null,zApiDomain='';
+
+function load(){
+  try{notes=JSON.parse(localStorage.getItem('rn3_notes')||'[]');}catch(e){notes=[];}
+  zToken=localStorage.getItem('rn3_tok')||null;
+  try{zUser=JSON.parse(localStorage.getItem('rn3_usr')||'{}');}catch(e){}
+  zFileId=localStorage.getItem('rn3_fid')||null;
+  zFolderId=localStorage.getItem('rn3_fold')||null;
+  zApiDomain=localStorage.getItem('rn3_api')||'';
+}
+function persist(){localStorage.setItem('rn3_notes',JSON.stringify(notes));}
+function saveZoho(tok,user,fid,fold,api){
+  zToken=tok;zUser=user;
+  if(fid){zFileId=fid;localStorage.setItem('rn3_fid',fid);}
+  if(fold){zFolderId=fold;localStorage.setItem('rn3_fold',fold);}
+  if(api){zApiDomain=api;localStorage.setItem('rn3_api',api);}
+  localStorage.setItem('rn3_tok',tok);
+  localStorage.setItem('rn3_usr',JSON.stringify(user));
+}
+function clearZoho(){
+  zToken=null;zUser={};zFileId=null;zFolderId=null;zApiDomain='';
+  ['rn3_tok','rn3_usr','rn3_fid','rn3_fold','rn3_api'].forEach(k=>localStorage.removeItem(k));
+}
+
+function renderNotes(q=''){
+  const grid=document.getElementById('grid');
+  const empty=document.getElementById('empty');
+  grid.querySelectorAll('.nc').forEach(c=>c.remove());
+  let list=q?notes.filter(n=>n.title.toLowerCase().includes(q.toLowerCase())||n.body.toLowerCase().includes(q.toLowerCase())):[...notes];
+  list=[...list.filter(n=>n.pinned),...list.filter(n=>!n.pinned)];
+  if(!list.length){empty.style.display='block';}
+  else{
+    empty.style.display='none';
+    list.forEach(n=>{
+      const d=document.createElement('div');
+      d.className='nc '+n.color;
+      d.innerHTML=(n.pinned?'<span class="pin">📌</span>':'')
+        +'<div class="nt">'+esc(n.title||'बिना शीर्षक')+'</div>'
+        +'<div class="np">'+esc(n.body)+'</div>'
+        +'<div class="nm"><span class="nd">'+n.date+'</span><span class="ni">'+(n.synced?'☁️':'💾')+'</span></div>'
+        +'<button class="ndel" onclick="delNote(event,''+n.id+'')">✕</button>';
+      d.addEventListener('click',()=>openNote(n.id));
+      grid.appendChild(d);
+    });
+  }
+  document.getElementById('ncc').textContent=notes.length+' नोट';
+  document.getElementById('sNC').textContent=notes.length;
+}
+function esc(s){return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');}
+
+function newNote(){
+  curId=null;curPinned=false;curColor=COLORS[Math.floor(Math.random()*COLORS.length)];
+  document.getElementById('ntitle').value='';document.getElementById('nbody').value='';
+  document.getElementById('pinBtn').style.opacity='0.45';
+  updateMeta();buildCrow();applyEBg();
+  document.getElementById('ep').classList.add('open');
+  setTimeout(()=>document.getElementById('ntitle').focus(),400);
+}
+function openNote(id){
+  const n=notes.find(x=>x.id===id);if(!n)return;
+  curId=id;curColor=n.color;curPinned=n.pinned||false;
+  document.getElementById('ntitle').value=n.title;document.getElementById('nbody').value=n.body;
+  document.getElementById('pinBtn').style.opacity=curPinned?'1':'0.45';
+  updateMeta();buildCrow();applyEBg();document.getElementById('ep').classList.add('open');
+}
+function closeEditor(){document.getElementById('ep').classList.remove('open');}
+function applyEBg(){document.getElementById('ep').style.background=CHEX[curColor];}
+function buildCrow(){
+  const row=document.getElementById('crow');row.innerHTML='';
+  COLORS.forEach(c=>{
+    const d=document.createElement('div');d.className='cdot'+(c===curColor?' on':'');d.style.background=CHEX[c];
+    d.onclick=()=>{curColor=c;row.querySelectorAll('.cdot').forEach(x=>x.classList.remove('on'));d.classList.add('on');applyEBg();};
+    row.appendChild(d);
+  });
+}
+function updateMeta(){
+  const b=document.getElementById('nbody').value;
+  const w=b.trim()?b.trim().split(/\s+/).length:0;
+  document.getElementById('wc').textContent=w+' शब्द';document.getElementById('cc').textContent=b.length+' अक्षर';
+}
+function togglePin(){curPinned=!curPinned;document.getElementById('pinBtn').style.opacity=curPinned?'1':'0.45';toast(curPinned?'📌 Pin किया':'📌 Unpin किया');}
+function fmt(before,after){
+  before=before.replace(/\\n/g,'\n');after=after.replace(/\\n/g,'\n');
+  const ta=document.getElementById('nbody');const s=ta.selectionStart,e=ta.selectionEnd;const sel=ta.value.substring(s,e);
+  ta.value=ta.value.substring(0,s)+before+sel+after+ta.value.substring(e);
+  ta.selectionStart=ta.selectionEnd=s+before.length+sel.length+after.length;ta.focus();updateMeta();
+}
+function saveNote(){
+  const title=document.getElementById('ntitle').value.trim();const body=document.getElementById('nbody').value.trim();
+  if(!title&&!body){closeEditor();return;}
+  const date=new Date().toLocaleDateString('hi-IN',{day:'2-digit',month:'short',year:'2-digit'});
+  if(curId){const i=notes.findIndex(n=>n.id===curId);if(i>-1)notes[i]={...notes[i],title,body,color:curColor,date,pinned:curPinned,synced:false};}
+  else{notes.push({id:Date.now().toString(36)+Math.random().toString(36).slice(2,5),title,body,color:curColor,date,pinned:curPinned,synced:false});}
+  persist();renderNotes(document.getElementById('si').value);closeEditor();toast('✅ नोट save हो गया!');
+  if(zToken&&!syncing)setTimeout(()=>upload(true),1200);
+}
+function delNote(e,id){
+  e.stopPropagation();
+  if(confirm('इस नोट को मिटाना है?')){notes=notes.filter(n=>n.id!==id);persist();renderNotes();toast('🗑️ मिटा दिया');}
+}
+
+/* ── ZOHO IMPLICIT FLOW ── */
+function getRedirectUri(){const p=window.location.pathname.replace(/\/[^/]*$/,'/');return window.location.origin+p+'oauth_callback.html';}
+function getClientId(){return localStorage.getItem('rn3_cid')||'';}
+function getRegion(){return localStorage.getItem('rn3_reg')||'in';}
+
+function setRuDisplay(){const el=document.getElementById('ruDisplay');if(el)el.textContent=getRedirectUri();}
+
+function startZohoLogin(){
+  const cid=document.getElementById('zci').value.trim();const reg=document.getElementById('zreg').value;
+  if(!cid){toast('⚠️ Client ID डालें');return;}
+  if(!cid.startsWith('1000.')){toast('⚠️ Client ID "1000." से शुरू होनी चाहिए');return;}
+  localStorage.setItem('rn3_cid',cid);localStorage.setItem('rn3_reg',reg);
+  const wurl=document.getElementById('zwurl').value.trim();
+  if(wurl)localStorage.setItem('rn3_worker',wurl);
+  const params=new URLSearchParams({
+    client_id:cid,response_type:'code',scope:ZOHO_SCOPES,
+    redirect_uri:getRedirectUri(),access_type:'offline',prompt:'consent'
+  });
+  const url='https://accounts.zoho.'+reg+'/oauth/v2/auth?'+params;
+  closeZM();
+  const popup=window.open(url,'ZohoLogin','width=500,height=650,scrollbars=yes,resizable=yes');
+  if(!popup){window.location.href=url;}
+}
+
+window.addEventListener('message',function(e){
+  if(!e.data||!e.data.type)return;
+  if(e.data.type==='ZOHO_IMPLICIT_TOKEN'){
+    const p=e.data.payload;if(p&&p.access_token)handleImplicitToken(p);
+  } else if(e.data.type==='ZOHO_AUTH_CODE'){
+    // Exchange code for token via Netlify function
+    exchangeCodeForToken(e.data.code);
+  } else if(e.data.type==='ZOHO_AUTH_ERROR'){
+    toast('❌ Zoho error: '+(e.data.error||'unknown'),4000);setSdot('off');
+  }
+});
+
+async function handleImplicitToken(payload){
+  const {access_token,api_domain}=payload;
+  toast('👤 User info ला रहे हैं...');
+  const reg=getRegion();
+  let user={name:'Zoho User',email:''};
+  const endpoints=['https://accounts.zoho.'+reg+'/oauth/v2/userstuff/user','https://accounts.zoho.'+reg+'/oauth/v2/user/info'];
+  for(const ep of endpoints){
+    try{
+      const r=await fetch(ep,{headers:{'Authorization':'Zoho-oauthtoken '+access_token}});
+      if(r.ok){const d=await r.json();user={name:d.Display_Name||d.Email||d.First_Name||'Zoho User',email:d.Email||''};break;}
+    }catch(e){}
+  }
+  saveZoho(access_token,user,null,null,api_domain||'');updateAcctUI();
+  toast('✅ Login: '+user.name);openSync();appendLog('✅ Login: '+user.name);
+  await fetchWDFolder(access_token,reg);
+  await upload(true);
+}
+
+/* ── TOKEN EXCHANGE via Netlify Function ── */
+async function exchangeCodeForToken(code){
+  toast('🔄 Token exchange हो रहा है...');
+  setSdot('sync');
+  try{
+    const workerUrl = localStorage.getItem('rn3_worker') || 'https://notepad-pro.raghuveerbhati525.workers.dev';
+    const resp = await fetch(workerUrl, {
+      method: 'POST',
+      headers: {'Content-Type':'application/json'},
+      body: JSON.stringify({code: code, redirect_uri: getRedirectUri()})
+    });
+    const data = await resp.json();
+    if(data.error){
+      toast('❌ Token exchange fail: '+data.error, 4000);
+      setSdot('off');
+      return;
+    }
+    if(data.access_token){
+      await handleImplicitToken({
+        access_token: data.access_token,
+        api_domain:   '',
+        expires_in:   data.expires_in || '3600',
+        token_type:   data.token_type || 'Bearer',
+        scope:        data.scope      || ''
+      });
+      // Save refresh token if available
+      if(data.refresh_token){
+        localStorage.setItem('rn3_refresh', data.refresh_token);
+      }
+    }
+  }catch(err){
+    toast('❌ Network error: '+err.message, 4000);
+    setSdot('off');
+  }
+}
+
+/* ── WORKDRIVE ── */
+async function fetchWDFolder(tok,reg){
+  try{
+    const r=await fetch('https://workdrive.zoho.'+reg+'/api/v1/privatespace',{headers:{'Authorization':'Zoho-oauthtoken '+tok,'Accept':'application/vnd.api+json'}});
+    if(r.ok){const d=await r.json();const fid=d?.data?.attributes?.resource_id||d?.data?.id||'';if(fid){zFolderId=fid;localStorage.setItem('rn3_fold',fid);appendLog('📁 Folder: '+fid);}}
+  }catch(e){appendLog('⚠️ Folder: '+e.message);}
+}
+
+async function upload(silent=false){
+  if(!zToken){toast('⚠️ Zoho login करें');return;}
+  if(syncing)return;syncing=true;setSdot('sync');if(!silent)appendLog('⬆️ Backup...');
+  const reg=getRegion();
+  const payload=JSON.stringify({notes:notes,exportedAt:new Date().toISOString(),ver:3});
+  const blob=new Blob([payload],{type:'application/json'});
+  const fd=new FormData();fd.append('content',blob,BACKUP_FILE);
+  if(!zFolderId)await fetchWDFolder(zToken,reg);
+  const fid=zFolderId||'';
+  if(!fid){appendLog('❌ Folder ID नहीं मिला');syncing=false;setSdot(zToken?'on':'off');return;}
+  try{
+    const url='https://workdrive.zoho.'+reg+'/api/v1/upload?parent_id='+fid+'&override-name-exist=true';
+    const r=await fetch(url,{method:'POST',headers:{'Authorization':'Zoho-oauthtoken '+zToken},body:fd});
+    let data={};try{data=await r.json();}catch(e){}
+    if(r.ok||r.status===200||(data.data&&!data.errors)){
+      const nfid=data?.data?.[0]?.attributes?.resource_id||data?.data?.[0]?.id||zFileId;
+      if(nfid&&!zFileId){zFileId=nfid;localStorage.setItem('rn3_fid',nfid);}
+      notes=notes.map(n=>({...n,synced:true}));persist();
+      const now=new Date().toLocaleTimeString('hi-IN',{hour:'2-digit',minute:'2-digit'});
+      localStorage.setItem('rn3_ls',now);document.getElementById('sLS').textContent=now;
+      setSdot('on');if(!silent){appendLog('✅ Backup: '+now);toast('☁️ Backup हो गया!');}renderNotes();
+    }else throw new Error(JSON.stringify(data).slice(0,100));
+  }catch(e){setSdot('off');appendLog('❌ Fail: '+e.message);if(!silent)toast('❌ Backup fail');}
+  syncing=false;
+}
+
+async function doDownload(){
+  if(!zToken){toast('⚠️ Zoho login करें');return;}
+  const reg=getRegion();appendLog('⬇️ Restore...');setSdot('sync');
+  try{
+    if(!zFolderId)await fetchWDFolder(zToken,reg);
+    const lr=await fetch('https://workdrive.zoho.'+reg+'/api/v1/files/'+zFolderId+'/files',{headers:{'Authorization':'Zoho-oauthtoken '+zToken,'Accept':'application/vnd.api+json'}});
+    if(!lr.ok)throw new Error('List fail: '+lr.status);
+    const ld=await lr.json();const files=ld?.data||[];
+    const bf=files.find(f=>(f?.attributes?.name||'').includes('rangeennotes'));
+    if(!bf){appendLog('⚠️ Backup file नहीं मिली');toast('⚠️ Backup नहीं मिला');setSdot(zToken?'on':'off');return;}
+    const fid=bf.id||bf?.attributes?.resource_id;zFileId=fid;localStorage.setItem('rn3_fid',fid);
+    const dr=await fetch('https://workdrive.zoho.'+reg+'/api/v1/download/'+fid,{headers:{'Authorization':'Zoho-oauthtoken '+zToken}});
+    if(!dr.ok)throw new Error('Download fail: '+dr.status);
+    const bk=JSON.parse(await dr.text());
+    if(bk.notes&&Array.isArray(bk.notes)){
+      if(confirm('☁️ '+bk.notes.length+' नोट्स मिले। Local replace होंगे। Continue?')){
+        notes=bk.notes;persist();renderNotes();appendLog('✅ Restore: '+bk.notes.length);toast('✅ '+bk.notes.length+' नोट्स restore!');
+      }
+    }else throw new Error('Invalid format');
+  }catch(e){appendLog('❌ Restore fail: '+e.message);toast('❌ Restore fail');}
+  setSdot(zToken?'on':'off');
+}
+
+function zohoLogout(){if(!confirm('Zoho unlink करना है?'))return;clearZoho();updateAcctUI();closeSync();toast('👋 Logout');}
+
+/* ── UI ── */
+function setSdot(s){const d=document.getElementById('sdot');d.className='sdot';if(s==='off')d.classList.add('off');else if(s==='sync')d.classList.add('sync');}
+function updateAcctUI(){
+  const in_=!!zToken;const nm=zUser?.name||'Zoho जोड़ें';const init=nm.charAt(0).toUpperCase();
+  document.getElementById('av').textContent=init;document.getElementById('acnm').textContent=nm;setSdot(in_?'on':'off');
+  document.getElementById('spIn').style.display=in_?'flex':'none';document.getElementById('spOut').style.display=in_?'none':'flex';
+  document.getElementById('spAv').textContent=init;document.getElementById('spNm').textContent=nm;document.getElementById('spEm').textContent=zUser?.email||'';
+  document.getElementById('sLS').textContent=localStorage.getItem('rn3_ls')||'—';document.getElementById('sNC').textContent=notes.length;
+}
+function appendLog(msg){const l=document.getElementById('slog');l.innerHTML+='<br>'+msg;l.scrollTop=l.scrollHeight;}
+function openSync(){updateAcctUI();document.getElementById('sp').classList.add('open');}
+function closeSync(){document.getElementById('sp').classList.remove('open');}
+function openZM(){setRuDisplay();document.getElementById('zci').value=getClientId();document.getElementById('zreg').value=getRegion();const wu=document.getElementById('zwurl');if(wu)wu.value=localStorage.getItem('rn3_worker')||'';document.getElementById('zm').classList.add('open');}
+function closeZM(){document.getElementById('zm').classList.remove('open');}
+
+let _tt;
+function toast(msg,dur=2700){const el=document.getElementById('toast');el.textContent=msg;el.classList.add('show');clearTimeout(_tt);_tt=setTimeout(()=>el.classList.remove('show'),dur);}
+
+function updateOnline(){const o=document.getElementById('offbar');if(navigator.onLine){o.classList.remove('on');setSdot(zToken?'on':'off');}else{o.classList.add('on');setSdot('off');}}
+window.addEventListener('online',updateOnline);window.addEventListener('offline',updateOnline);
+document.addEventListener('keydown',e=>{
+  if(e.key==='Escape'){closeEditor();closeSync();closeZM();}
+  if(e.ctrlKey&&e.key==='s'){e.preventDefault();saveNote();}
+  if(e.ctrlKey&&e.key==='n'){e.preventDefault();newNote();}
+});
+
+/* SW */
+if('serviceWorker' in navigator){
+  window.addEventListener('load',()=>{navigator.serviceWorker.register('service-worker.js').catch(()=>{});});
+  navigator.serviceWorker.addEventListener('message',e=>{if(e.data&&e.data.type==='BACKGROUND_SYNC'&&zToken)upload(true);});
+}
+
+/* Check for token returned from same-tab redirect */
+window.addEventListener('load',function(){
+  const stored=localStorage.getItem('zoho_implicit_token');
+  if(stored){localStorage.removeItem('zoho_implicit_token');try{const p=JSON.parse(stored);if(p&&p.access_token)handleImplicitToken(p);}catch(e){}}
+  const storedCode=localStorage.getItem('zoho_auth_code');
+  if(storedCode){localStorage.removeItem('zoho_auth_code');try{const c=JSON.parse(storedCode);if(c&&c.code)exchangeCodeForToken(c.code);}catch(e){}}
+  const storedErr=localStorage.getItem('zoho_auth_error');
+  if(storedErr){localStorage.removeItem('zoho_auth_error');toast('❌ Zoho: '+storedErr,5000);}
+  const storedErr=localStorage.getItem('zoho_auth_error');
+  if(storedErr){localStorage.removeItem('zoho_auth_error');toast('❌ Zoho error: '+storedErr,4000);}
+});
+
+load();renderNotes();updateAcctUI();updateOnline();setRuDisplay();
+setTimeout(()=>{if(!zToken&&notes.length>0)toast('☁️ Backup के लिए Zoho icon दबाएं',4000);},3500);
+</script>
+</body>
+</html>
