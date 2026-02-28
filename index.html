@@ -564,9 +564,7 @@ window.addEventListener('load',function(){
   if(storedCode){localStorage.removeItem('zoho_auth_code');try{const c=JSON.parse(storedCode);if(c&&c.code)exchangeCodeForToken(c.code);}catch(e){}}
   const storedErr=localStorage.getItem('zoho_auth_error');
   if(storedErr){localStorage.removeItem('zoho_auth_error');toast('❌ Zoho: '+storedErr,5000);}
-  const storedErr=localStorage.getItem('zoho_auth_error');
-  if(storedErr){localStorage.removeItem('zoho_auth_error');toast('❌ Zoho error: '+storedErr,4000);}
-});
+  });
 
 load();renderNotes();updateAcctUI();updateOnline();setRuDisplay();
 setTimeout(()=>{if(!zToken&&notes.length>0)toast('☁️ Backup के लिए Zoho icon दबाएं',4000);},3500);
