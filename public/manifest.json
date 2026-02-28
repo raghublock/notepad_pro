@@ -1,0 +1,36 @@
+{
+  "name": "रंगीन नोट्स",
+  "short_name": "रंगीन नोट्स",
+  "description": "रंगीन नोट्स — Zoho Cloud Backup के साथ",
+  "start_url": "./index.html",
+  "display": "standalone",
+  "background_color": "#1a0a2e",
+  "theme_color": "#1a0a2e",
+  "orientation": "portrait-primary",
+  "lang": "hi",
+  "categories": ["productivity", "utilities"],
+  "icons": [
+    {
+      "src": "icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
+  ],
+  "screenshots": [],
+  "shortcuts": [
+    {
+      "name": "नया नोट",
+      "short_name": "नोट",
+      "description": "नया नोट बनाएं",
+      "url": "./index.html?action=new",
+      "icons": [{ "src": "icon-192.png", "sizes": "192x192" }]
+    }
+  ]
+}
