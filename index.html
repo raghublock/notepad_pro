@@ -437,7 +437,7 @@ async function exchangeCodeForToken(code){
   toast('🔄 Token exchange: '+code.slice(0,15)+'...');
   setSdot('sync');
   try{
-    const workerUrl = localStorage.getItem('rn3_worker') || 'https://notepad-pro.raghuveerbhati525.workers.dev';
+    const workerUrl = (localStorage.getItem('rn3_worker') || 'https://notepad-pro.raghuveerbhati525.workers.dev').replace(/\/+$/,'');
     const redirectUri = getRedirectUri();
     appendLog('🔄 Worker: '+workerUrl);
     appendLog('🔄 redirect_uri: '+redirectUri);
@@ -559,7 +559,14 @@ document.addEventListener('keydown',e=>{
 
 /* SW */
 if('serviceWorker' in navigator){
-  window.addEventListener('load',()=>{navigator.serviceWorker.register('service-worker.js').catch(()=>{});});
+  // Unregister any old service workers that might interfere
+  navigator.serviceWorker.getRegistrations().then(function(registrations){
+    for(let r of registrations){ r.unregister(); }
+  });
+  // Re-register fresh
+  window.addEventListener('load',()=>{
+    navigator.serviceWorker.register('service-worker.js').catch(()=>{});
+  });
   navigator.serviceWorker.addEventListener('message',e=>{if(e.data&&e.data.type==='BACKGROUND_SYNC'&&zToken)upload(true);});
 }
 
