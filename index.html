@@ -437,7 +437,7 @@ async function exchangeCodeForToken(code){
   toast('🔄 Token exchange: '+code.slice(0,15)+'...');
   setSdot('sync');
   try{
-    const workerUrl = (localStorage.getItem('rn3_worker') || 'https://notepad-pro.raghuveerbhati525.workers.dev').replace(/\/+$/,'');
+    const workerUrl = (localStorage.getItem('rn3_worker') || 'https://notepad.raghuveerbhati525.workers.dev').replace(/\/+$/,'');
     const redirectUri = getRedirectUri();
     appendLog('🔄 Worker: '+workerUrl);
     appendLog('🔄 redirect_uri: '+redirectUri);
