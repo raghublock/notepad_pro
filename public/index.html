@@ -182,10 +182,8 @@ select.mi option{background:#1a0a2e;}
   <div class="etb">
     <button class="fb" onclick="fmt('**','**')"><b>B</b></button>
     <button class="fb" onclick="fmt('_','_')"><i>I</i></button>
-    <button class="fb" onclick="fmt('
-• ','')">•</button>
-    <button class="fb" onclick="fmt('
-☐ ','')">☐</button>
+    <button class="fb" onclick="fmt('\n• ','')">•</button>
+    <button class="fb" onclick="fmt('\n☐ ','')">☐</button>
     <div class="fsep"></div>
     <button class="fb" id="pinBtn" onclick="togglePin()" style="opacity:0.45">📌</button>
   </div>
@@ -355,6 +353,7 @@ function updateMeta(){
 }
 function togglePin(){curPinned=!curPinned;document.getElementById('pinBtn').style.opacity=curPinned?'1':'0.45';toast(curPinned?'📌 Pin किया':'📌 Unpin किया');}
 function fmt(before,after){
+  before=before.replace(/\\n/g,'\n');after=after.replace(/\\n/g,'\n');
   const ta=document.getElementById('nbody');const s=ta.selectionStart,e=ta.selectionEnd;const sel=ta.value.substring(s,e);
   ta.value=ta.value.substring(0,s)+before+sel+after+ta.value.substring(e);
   ta.selectionStart=ta.selectionEnd=s+before.length+sel.length+after.length;ta.focus();updateMeta();
