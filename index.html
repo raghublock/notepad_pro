@@ -498,7 +498,7 @@ async function upload(silent=false){
   try{
     const workerUrl2=(localStorage.getItem('rn3_worker')||'https://zoho-token.raghuveerbhati525.workers.dev').replace(/\/+$/,'');
     const url=workerUrl2+'/upload';
-    const r=await fetch(url,{method:'POST',headers:{'X-Zoho-Token':zToken,'X-Folder-Id':fid,'Content-Type':'multipart/form-data'},body:fd});
+    const r=await fetch(url,{method:'POST',headers:{'X-Zoho-Token':zToken,'X-Folder-Id':fid},body:fd});
     let data={};try{data=await r.json();}catch(e){}
     if(r.ok||r.status===200||(data.data&&!data.errors)){
       const nfid=data?.data?.[0]?.attributes?.resource_id||data?.data?.[0]?.id||zFileId;
