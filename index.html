@@ -437,12 +437,12 @@ async function exchangeCodeForToken(code){
   toast('🔄 Token exchange: '+code.slice(0,15)+'...');
   setSdot('sync');
   try{
-    const workerUrl = (localStorage.getItem('rn3_worker') || 'https://notepad.raghuveerbhati525.workers.dev').replace(/\/+$/,'');
+    const workerUrl = (localStorage.getItem('rn3_worker') || 'https://zoho-token.raghuveerbhati525.workers.dev').replace(/\/+$/,'');
     const redirectUri = getRedirectUri();
-    appendLog('🔄 Worker: '+workerUrl);
+    appendLog('🔄 Worker: '+workerUrl+'/token');
     appendLog('🔄 redirect_uri: '+redirectUri);
     appendLog('🔄 code: '+code.slice(0,20)+'...');
-    const resp = await fetch(workerUrl, {
+    const resp = await fetch(workerUrl+'/token', {
       method: 'POST',
       headers: {'Content-Type':'application/json'},
       body: JSON.stringify({code: code, redirect_uri: redirectUri})
