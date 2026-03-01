@@ -272,7 +272,7 @@ const BACKUP_FILE='rangeennotes_v3.json';
 const ZOHO_SCOPES='WorkDrive.files.CREATE,WorkDrive.files.READ,WorkDrive.files.UPDATE,ZohoFiles.files.READ,AaaServer.profile.READ';
 
 let notes=[],curId=null,curColor='c0',curPinned=false,syncing=false;
-let zToken=null,zUser={},zFileId=null,zFolderId=null,zApiDomain='';
+let zToken=null,zUser={},zFileId=null,zFolderId='soiej1ed1ef784a3247e2b7be658c11037401',zApiDomain='';
 
 function load(){
   try{notes=JSON.parse(localStorage.getItem('rn3_notes')||'[]');}catch(e){notes=[];}
