@@ -431,8 +431,9 @@ async function handleImplicitToken(payload){
   await fetchWDFolder(access_token,reg);
   // If folder still not found, check localStorage
   if(!zFolderId) zFolderId = localStorage.getItem('rn3_fold')||null;
-  if(zFolderId) await upload(true);
-  else appendLog('⚠️ Folder ID नहीं मिला — WorkDrive pe NotepadBackup folder banao aur ID set karo');
+  if(!zFolderId) zFolderId = localStorage.getItem('rn3_fold')||'soiej1ed1ef784a3247e2b7be658c11037401';
+  localStorage.setItem('rn3_fold', zFolderId);
+  await upload(true);
 }
 
 /* ── TOKEN EXCHANGE via Netlify Function ── */
@@ -478,13 +479,14 @@ async function exchangeCodeForToken(code){
 
 /* ── WORKDRIVE ── */
 async function fetchWDFolder(tok,reg){
-  try{
-    const workerUrl=(localStorage.getItem('rn3_worker')||'https://zoho-token.raghuveerbhati525.workers.dev').replace(/\/+$/,'');
-    const r=await fetch(workerUrl+'/folder',{headers:{'X-Zoho-Token':tok,'Accept':'application/vnd.api+json'}});
-    if(r.ok){const d=await r.json();const fid=d?.data?.attributes?.resource_id||d?.data?.id||'';if(fid){zFolderId=fid;localStorage.setItem('rn3_fold',fid);appendLog('📁 Folder: '+fid);}}
-    else{const e=await r.json();appendLog('⚠️ Folder error: '+JSON.stringify(e));}
-  }catch(e){appendLog('⚠️ Folder: '+e.message);}
+  // Use hardcoded folder ID - WorkDrive API scope not available
+  if(!zFolderId){
+    zFolderId=localStorage.getItem('rn3_fold')||'soiej1ed1ef784a3247e2b7be658c11037401';
+    localStorage.setItem('rn3_fold',zFolderId);
+    appendLog('📁 Folder set: '+zFolderId.slice(0,12)+'...');
+  }
 }
+
 
 async function upload(silent=false){
   if(!zToken){toast('⚠️ Zoho login करें');return;}
