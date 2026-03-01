@@ -241,7 +241,7 @@ select.mi option{background:#1a0a2e;}
     <div class="sptitle">☁️ Zoho Backup</div>
   </div>
   <div id="spIn" style="display:none;flex-direction:column;gap:11px;flex:1">
-    <div class="tw"><strong>⚠️ Token 1 घंटे में expire होगा</strong>Implicit Flow की वजह से — 1 घंटे बाद दोबारा login करें।</div>
+    <div class="tw" id="implicitWarn" style="display:none"><strong>⚠️ Token 1 घंटे में expire होगा</strong>Implicit Flow की वजह से — 1 घंटे बाद दोबारा login करें।</div>
     <div class="sc">
       <div class="sur"><div class="sav" id="spAv">?</div><div><div class="sn2" id="spNm">—</div><div class="se" id="spEm">—</div></div></div>
       <div class="sst"><div class="ssb"><div class="ssv" id="sNC">0</div><div class="ssl">नोट्स</div></div><div class="ssb"><div class="ssv" id="sLS" style="font-size:13px">—</div><div class="ssl">Last Sync</div></div></div>
@@ -418,10 +418,11 @@ async function handleImplicitToken(payload){
   toast('👤 User info ला रहे हैं...');
   const reg=getRegion();
   let user={name:'Zoho User',email:''};
-  const endpoints=['https://accounts.zoho.'+reg+'/oauth/v2/userstuff/user','https://accounts.zoho.'+reg+'/oauth/v2/user/info'];
+  const workerUrlU=(localStorage.getItem('rn3_worker')||'https://zoho-token.raghuveerbhati525.workers.dev').replace(/\/+$/,'');
+  const endpoints=[workerUrlU+'/userinfo'];
   for(const ep of endpoints){
     try{
-      const r=await fetch(ep,{headers:{'Authorization':'Zoho-oauthtoken '+access_token}});
+      const r=await fetch(ep,{headers:{'X-Zoho-Token':access_token}});
       if(r.ok){const d=await r.json();user={name:d.Display_Name||d.Email||d.First_Name||'Zoho User',email:d.Email||''};break;}
     }catch(e){}
   }
