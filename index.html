@@ -490,7 +490,9 @@ async function upload(silent=false){
   const payload=JSON.stringify({notes:notes,exportedAt:new Date().toISOString(),ver:3});
   const blob=new Blob([payload],{type:'application/json'});
   const fd=new FormData();fd.append('content',blob,BACKUP_FILE);
+  if(!zFolderId)zFolderId=localStorage.getItem('rn3_fold')||null;
   if(!zFolderId)await fetchWDFolder(zToken,reg);
+  if(!zFolderId)zFolderId=localStorage.getItem('rn3_fold')||null;
   const fid=zFolderId||'';
   if(!fid){appendLog('❌ Folder ID नहीं मिला');syncing=false;setSdot(zToken?'on':'off');return;}
   try{
